@@ -1,6 +1,10 @@
-SOURCE_FILE=src/manifest.c
-BUILD_OPTIONS_CURL=$(shell curl-config --cflags --libs)
-BUILD_OPTIONS=-Wall
+COMPILER_ARGS=-Wall
+LIBCURL_COMPILER_ARGS=$(shell curl-config --libs --cflags)
+SRC_FOLDER=src
+MANIFEST_SOURCE=$(SRC_FOLDER)/manifest.c
+OUTPUT_NAME=firefoxext
+OUTPUT_FOLDER=bin
+
 build:
-	mkdir -p bin
-	gcc $(BUILD_OPTIONS) $(BUILD_OPTIONS_CURL) $(SOURCE_FILE) -o bin/firefoxext
+	mkdir -p $(OUTPUT_FOLDER)
+	gcc $(COMPILER_ARGS) $(LIBCURL_COMPILER_ARGS) $(MANIFEST_SOURCE) -o $(OUTPUT_FOLDER)/$(OUTPUT_NAME)

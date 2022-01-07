@@ -1,6 +1,5 @@
-#include "cli.h"
-#include "cli.c"
-#include "query.h"
-#include "query.c"
+#include "cli/query.h"
+#include "cli/query.c"
+
 // main function
 #include "firefoxext.c"
