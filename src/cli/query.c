@@ -1,7 +1,10 @@
 #include "query.h"
-#include "config.def.h"
+#include "../utils.h"
+#include "../utils.c"
+#include "../config.def.h"
 #include <string.h>
 #include <stdlib.h>
+#include <cjson/cJSON.h>
 #include <stdio.h>
 // include header files for curl
 #include <unistd.h>
@@ -43,6 +46,47 @@ void query_extension(char name[]){
     curl_easy_cleanup(curl_handle);    
     printf("Downloaded query info, parsing...\n");
     // parse the contents of query.json
+    char *buffer = NULL;
+    size_t size = 0;
+    FILE *fp = fopen("query.json", "r");
+    fseek(fp, 0, SEEK_END); /* Go to end of file */
+    size = ftell(fp); /* How many bytes did we pass ? */
+    rewind(fp);
+    buffer = malloc((size + 1) * sizeof(*buffer)); /* size + 1 byte for the \0 */
+    fread(buffer, size, 1, fp); /* Read 1 chunk of size bytes from fp into buffer */
+
+    /* NULL-terminate the buffer */
+    buffer[size] = '\0';
+    cJSON* query_result = parse_json_file(buffer);
+    printf("Loading results...\n");
+    const cJSON* results = NULL;
+    results = cJSON_GetObjectItemCaseSensitive(query_result, "results");
+    const cJSON *ext = NULL;
+    // print all of the results
+    cJSON_ArrayForEach(ext, results)
+    {
+        // char *string = cJSON_Print(ext);
+        const cJSON* id_json = cJSON_GetObjectItem(ext, "id");
+        const cJSON* type_json = cJSON_GetObjectItem(ext, "type");
+        const cJSON* url_json = cJSON_GetObjectItem(ext, "url");
+        const char *id = cJSON_Print(id_json);
+        const char *type = cJSON_Print(type_json);
+        const char *url = cJSON_Print(url_json);
+        printf("----------------------------------\n");
+        printf("Extension Type: %s\n", type);
+        printf("Extension Store URL: %s\n", url);
+        printf("Extension ID: %s\n", id);
+    }
+    printf("----------------------------------\n");
+    printf("To install an extension use: 'firefoxext install [extensionid]'\n");
+    // cleanup files
+    if (remove("query.json") != 0){
+        printf("Failed to remove query.json!\n");
+        printf("Please remove this file before running again\n");
+        exit(1);
+    } else {
+        exit(0);
+    }
 } 
 char* replace(const char* s, const char* oldW, char* newW){
     char* result;

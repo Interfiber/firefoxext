@@ -1,7 +1,7 @@
-COMPILER_ARGS=-Wall
+COMPILER_ARGS=-std=c99 -Wall -lcjson
 LIBCURL_COMPILER_ARGS=$(shell curl-config --libs --cflags)
 SRC_FOLDER=src
-MANIFEST_SOURCE=$(SRC_FOLDER)/manifest.c
+MANIFEST_SOURCE=$(SRC_FOLDER)/firefoxext.c
 OUTPUT_NAME=firefoxext
 OUTPUT_FOLDER=bin
 
