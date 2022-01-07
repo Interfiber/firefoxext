@@ -1,1 +1,2 @@
-static const char extension_query_url[] = "https://addons.mozilla.org/api/v5/addons/autocomplete/?app=firefox&q=QUERY";
+static const char extension_query_url[] = "https://addons.mozilla.org/api/v5/addons/search/?q=QUERY";
+static const char extension_download_url[] = "https://addons.mozilla.org/firefox/downloads/file/ID";

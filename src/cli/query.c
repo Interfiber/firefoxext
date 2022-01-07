@@ -66,16 +66,19 @@ void query_extension(char name[]){
     cJSON_ArrayForEach(ext, results)
     {
         // char *string = cJSON_Print(ext);
-        const cJSON* id_json = cJSON_GetObjectItem(ext, "id");
-        const cJSON* type_json = cJSON_GetObjectItem(ext, "type");
-        const cJSON* url_json = cJSON_GetObjectItem(ext, "url");
-        const char *id = cJSON_Print(id_json);
-        const char *type = cJSON_Print(type_json);
-        const char *url = cJSON_Print(url_json);
+        const cJSON* current_version_json = cJSON_GetObjectItemCaseSensitive(ext, "current_version");
+        const cJSON* current_file_version_json = cJSON_GetObjectItemCaseSensitive(current_version_json, "file");
+        const cJSON* current_file_id_json = cJSON_GetObjectItemCaseSensitive(current_file_version_json, "id");
+        const cJSON* current_store_url_json = cJSON_GetObjectItemCaseSensitive(ext, "url");
+        const cJSON* current_promoted_status_json = cJSON_GetObjectItemCaseSensitive(ext, "promoted");
         printf("----------------------------------\n");
-        printf("Extension Type: %s\n", type);
-        printf("Extension Store URL: %s\n", url);
-        printf("Extension ID: %s\n", id);
+        printf("Extension ID: %s\n",  cJSON_Print(current_file_id_json));
+        if (strncmp(cJSON_Print(current_promoted_status_json), "null", 51) == 0){
+            printf("Extension is promoted: no\n");
+        } else {
+            printf("Extension is promoted: yes\n");
+        }
+        printf("Extension Store URL: %s\n", cJSON_Print(current_store_url_json));
     }
     printf("----------------------------------\n");
     printf("To install an extension use: 'firefoxext install [extensionid]'\n");
@@ -127,5 +130,14 @@ char* get_query_url(char name[]){
     char replace_str[] = "QUERY";
     char* result = NULL;
     result = replace(extension_query_url, replace_str, name);
+    result = replace(result, " " , "\%");
+    return result;
+}
+char* get_download_url(int id){
+    char id_str[50];
+    sprintf(id_str, "%d", id);
+    char replace_str[] = "ID";
+    char* result = NULL;
+    result = replace(extension_download_url, replace_str, id_str);
     return result;
 }

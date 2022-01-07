@@ -2,3 +2,4 @@
 
 - cjson
 - curl
+- unzip
