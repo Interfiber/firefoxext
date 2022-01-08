@@ -17,3 +17,7 @@ cJSON* parse_json_file(char* data){
     }
     return root_json;
 }
+char* get_config_dir(){
+    char* xdg_config_dir = getenv("XDG_CONFIG_HOME");
+    return xdg_config_dir;
+}
