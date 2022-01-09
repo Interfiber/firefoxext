@@ -56,6 +56,32 @@ void install_extension_id(const cJSON* id){
     char* profile_dir = profile_dir_json->valuestring;
     printf("Install: Using profile dir %s\n", profile_dir);
     // check if the profile folder exists
+    DIR* dir = opendir(profile_dir);
+    if (dir) {
+        closedir(dir);
+    } else if (ENOENT == errno) {
+        printf("Failed to find profile dir! Make sure the path given in the config file, is aboslute.\n");
+        printf("Profile Location: %s\n", profile_dir);
+        exit(1);
+        return;
+    } else {
+        printf("Failed to call opendir(), something went wrong when testing if the profile exists!\n");
+        printf("Please report this bug to: https://github.com/Interfiber/firefoxext/issues\n");
+        exit(1);
+        return;
+    }
+    // update the extension.xpi file name
+    printf("Install: Update and Move extension files...\n");
+    char* extension_file_name = concat(extension_id, ".xpi");
+    char* extensions_dir = concat(profile_dir, "/extensions/");
+    rename("extension.xpi", concat(extensions_dir, extension_file_name));
+    printf("Install: Cleanup...\n");
+    remove(".manifest");
+    printf("Install: Restart firefox...\n");
+    // TODO: Allow option to not restart firefox
+    system("kill firefox");
+    printf("Install: Completed\n");
+    printf("Note: You will need allow firefox to load the installed extension!\n");
 }
 
 void install_extension(int id){
