@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "../utils.h"
+#include <errno.h>
+#include <dirent.h>
+#include <unistd.h>
 #include "query.h"
 
 char* concat(const char *s1, const char *s2){
@@ -26,10 +29,33 @@ void install_extension_id(const cJSON* id){
         // default location
         config_file = concat(homedir, "/.config/firefoxext.json");
     } else {
+        // location if the varible is set
         config_file = concat(xdg_config_dir, "/firefoxext.json");
     }
-    printf("Config file location: %s\n", config_file);
+    // check if we can read from the config file
+    if(access(config_file,F_OK) == -1 ) {
+        printf("Failed to find config file, make sure you have read and write access to it!\n");
+        printf("Expected config location: %s\n", config_file);
+        exit(1);
+        return;
+    } 
+    char *buffer = NULL;
+    size_t size = 0;
+    FILE *fp = fopen(config_file, "r");
+    fseek(fp, 0, SEEK_END); /* Go to end of file */
+    size = ftell(fp); /* How many bytes did we pass ? */
+    rewind(fp);
+    buffer = malloc((size + 1) * sizeof(*buffer)); /* size + 1 byte for the \0 */
+    fread(buffer, size, 1, fp); /* Read 1 chunk of size bytes from fp into buffer */
 
+    /* NULL-terminate the buffer */
+    buffer[size] = '\0';
+    cJSON* config = parse_json_file(buffer);
+    //  get profile dir
+    const cJSON* profile_dir_json = cJSON_GetObjectItemCaseSensitive(config, "profileDir");
+    char* profile_dir = profile_dir_json->valuestring;
+    printf("Install: Using profile dir %s\n", profile_dir);
+    // check if the profile folder exists
 }
 
 void install_extension(int id){
@@ -45,7 +71,7 @@ void install_extension(int id){
     system("unzip -p extension.xpi manifest.json >.manifest");
     printf("Loading metadata from extension...\n");
     // parse .manifest
-     char *buffer = NULL;
+    char *buffer = NULL;
     size_t size = 0;
     FILE *fp = fopen(".manifest", "r");
     fseek(fp, 0, SEEK_END); /* Go to end of file */
@@ -57,7 +83,6 @@ void install_extension(int id){
     /* NULL-terminate the buffer */
     buffer[size] = '\0';
     cJSON* manifest = parse_json_file(buffer);
-    printf("%s\n", cJSON_Print(manifest));
     // we need to look for the extension id in:
     // applications.gecko.id
     // browser_specific_settings.gecko.id
@@ -67,16 +92,16 @@ void install_extension(int id){
     const cJSON* browser_specific_settings = cJSON_GetObjectItemCaseSensitive(manifest, "browser_specific_settings");
 
     // load the data from the objects
-    const cJSON* gecko_applications = cJSON_GetObjectItemCaseSensitive(applications, "gecko");
-    const cJSON* gecko_browser = cJSON_GetObjectItemCaseSensitive(browser_specific_settings, "gecko");
-    const cJSON* applications_id = cJSON_GetObjectItemCaseSensitive(gecko_applications, "id");
-    const cJSON* browser_id = cJSON_GetObjectItemCaseSensitive(gecko_browser, "id");
+    cJSON* gecko_applications = cJSON_GetObjectItemCaseSensitive(applications, "gecko");
+    cJSON* gecko_browser = cJSON_GetObjectItemCaseSensitive(browser_specific_settings, "gecko");
+    cJSON* applications_id = cJSON_GetObjectItemCaseSensitive(gecko_applications, "id");
+    cJSON* browser_id = cJSON_GetObjectItemCaseSensitive(gecko_browser, "id");
     // detect which one has a value
-    if (!cJSON_IsNull(applications_id)){
-        printf("type of application id\n");
-        install_extension_id(applications_id);
-    } else if (!cJSON_IsNull(browser_id)){
+    if (applications_id == NULL){
         printf("type of browser id\n");
+        install_extension_id(browser_id);
+    } else if (browser_id == NULL){
+        printf("type of application id\n");
     } else {
         printf("an error occured during installation:\n");
         printf("The extension manifest does not contain a extension id\n");
