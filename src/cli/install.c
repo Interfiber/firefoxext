@@ -128,6 +128,7 @@ void install_extension(int id){
         install_extension_id(browser_id);
     } else if (browser_id == NULL){
         printf("type of application id\n");
+	install_extension_id(applications_id);
     } else {
         printf("an error occured during installation:\n");
         printf("The extension manifest does not contain a extension id\n");
