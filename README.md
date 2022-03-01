@@ -1,4 +1,4 @@
-# Firefox ext
+# Firefoxext
 Install firefox extensions from the commandline
 
 ## Why?
@@ -11,4 +11,4 @@ Currently firefox ext only supports linux. Macos, and Windows support should com
    - Theme installation
 
 ## Installation and docs
-The docs and installation can be found on the wiki(soon)
+The docs and installation can be found on the [wiki](https://github.com/Interfiber/firefoxext/wiki)
