@@ -8,4 +8,4 @@ Ever setup a new machine, or reinstalled firefox? Its a pain to have to install 
 Currently firefox ext only supports linux. Macos, and Windows support should come soon
 
 ## Installation and docs
-The docs and installation can be found on the wiki
+The docs and installation can be found on the [wiki](https://github.com/Interfiber/firefoxext/wiki)
