@@ -10,7 +10,6 @@
 
 char* concat(const char *s1, const char *s2){
     char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
-    // in real code you would check for errors in malloc here
     strcpy(result, s1);
     strcat(result, s2);
     return result;
@@ -78,9 +77,8 @@ void install_extension_id(const cJSON* id){
     printf("Install: Cleanup...\n");
     remove(".manifest");
     printf("Install: Restart firefox...\n");
-    // TODO: Allow option to not restart firefox
-    system("kill firefox");
     printf("Install: Completed\n");
+    printf("Install: Restart firefox for the changes to take effect\n");
     printf("Note: You will need allow firefox to load the installed extension!\n");
 }
 
