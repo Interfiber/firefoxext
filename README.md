@@ -1,4 +1,4 @@
-# Firefox ext
+# Firefoxext
 Install firefox extensions from the commandline
 
 ## Why?
