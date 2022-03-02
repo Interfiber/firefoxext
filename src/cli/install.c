@@ -2,18 +2,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "../utils.h"
 #include <errno.h>
 #include <dirent.h>
 #include <unistd.h>
 #include "query.h"
 
-char* concat(const char *s1, const char *s2){
-    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
-    strcpy(result, s1);
-    strcat(result, s2);
-    return result;
-}
 // this function is called after we find the extensions id, its not called by any cli commands
 void install_extension_id(const cJSON* id){
     char* extension_id;
@@ -71,8 +67,14 @@ void install_extension_id(const cJSON* id){
     }
     // update the extension.xpi file name
     printf("Install: Update and Move extension files...\n");
-    char* extension_file_name = concat(extension_id, ".xpi");
+    // check if the extensions folder exists, if not make it
     char* extensions_dir = concat(profile_dir, "/extensions/");
+    if (!extension_dir_exists(profile_dir)) {
+      printf("Install: Creating extensions directory for the first time!\n");
+      // create the extensions_dir
+      mkdir(extensions_dir, 0777);
+    }
+    char* extension_file_name = concat(extension_id, ".xpi");
     rename("extension.xpi", concat(extensions_dir, extension_file_name));
     printf("Install: Cleanup...\n");
     remove(".manifest");
