@@ -3,6 +3,7 @@
 - cjson
 - curl
 - unzip
+- pkg-config (build)
 
 ## Installing cjson
 
