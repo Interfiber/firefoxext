@@ -22,9 +22,19 @@ sudo apt install libcjson-dev
 sudo dnf install cjson
 ```
 
-### MacOS(Unsupported)
-
-#### Homebrew(https://brew.sh)
+#### Homebrew(Unsupported)
 ```bash
 brew install cjson
+```
+
+## Installing curl
+
+### Arch linux
+```bash
+sudo pacman -S curl
+```
+
+### Debian
+```bash
+sudo apt install libcurl4-openssl-dev curl
 ```
